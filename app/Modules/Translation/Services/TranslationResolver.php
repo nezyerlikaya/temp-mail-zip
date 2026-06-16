@@ -22,10 +22,14 @@ final class TranslationResolver
     {
         $this->namespaces->assertRegisteredKey($key);
 
+        $isMissing = ! isset($this->lines[$locale][$key]) && ! isset($this->lines[$fallbackLocale][$key]);
         $line = $this->lines[$locale][$key] ?? $this->lines[$fallbackLocale][$key] ?? "[missing:{$locale}:{$key}]";
 
         $this->assertSafeLine($line);
-        $this->assertPlaceholdersMatch($key, $line, $replacements);
+
+        if (! $isMissing) {
+            $this->assertPlaceholdersMatch($key, $line, $replacements);
+        }
 
         foreach ($replacements as $name => $value) {
             $line = str_replace(':'.$name, e((string) $value), $line);
